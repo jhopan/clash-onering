@@ -1,0 +1,20 @@
+diff --git a/transport/vmess/tls.go b/transport/vmess/tls.go
+index 6bede7f..55ac2b0 100644
+--- a/transport/vmess/tls.go
++++ b/transport/vmess/tls.go
+@@ -35,9 +35,14 @@ type TLSConfig struct {
+ }
+ 
+ func (cfg *TLSConfig) ToStdConfig() (*tls.Config, error) {
++	host := cfg.Host
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(host); real != "" {
++		host = real
++	}
+ 	return ca.GetTLSConfig(ca.Option{
+ 		TLSConfig: &tls.Config{
+-			ServerName:         cfg.Host,
++			ServerName:         host,
+ 			InsecureSkipVerify: cfg.SkipCertVerify,
+ 			NextProtos:         cfg.NextProtos,
+ 		},

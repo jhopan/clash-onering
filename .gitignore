@@ -1,0 +1,6 @@
+# fetched / built (not part of kit)
+mihomo/
+dist/
+*.onering
+*.onering.exe
+mihomo.*.onering*
