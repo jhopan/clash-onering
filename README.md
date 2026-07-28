@@ -4,7 +4,7 @@ Build **Mihomo (Clash Meta)** dengan patch SNI OneRing — `onering:REAL:BUG`.
 
 - TCP / server → bug domain (CDN/host gratis)
 - TLS SNI → real domain milikmu
-- **2 file diubah** di Mihomo (`onering.go` baru + patch `transport/vmess/tls.go`)
+- **2 file diubah** di Mihomo (`onering.go` baru + patch 6 protocol di `adapter/outbound`)
 - Kit ini: patch + script saja — bukan fork penuh Mihomo
 
 | | |
@@ -41,8 +41,8 @@ sha256sum -c SHA256SUMS.txt
 
 ```
 clash-onering/
-├── onering.patch   # patch transport/vmess/tls.go (+5 baris)
-├── onering.go      # ParseOneRing() — file baru di transport/vmess
+├── onering.patch   # patch 6 protocol (+4 baris per protocol)
+├── onering.go      # ParseOneRing() — file baru di adapter/outbound
 ├── apply.sh        # pilih versi → clone Mihomo → apply
 ├── build.sh        # --ver → apply + build binary
 ├── verify.sh       # cek patch / binary
@@ -105,6 +105,23 @@ bash apply.sh --list          # lihat tag tersedia
 bash build.sh --force --ver v1.19.30 all
 bash verify.sh
 ```
+
+---
+
+## Protocol yang didukung
+
+OneRing bekerja di **semua protocol TLS** Mihomo:
+
+| Protocol | Config key SNI | Cover? |
+|---|---|---|
+| VLESS | `servername` | ✅ |
+| VMess | `servername` | ✅ |
+| Trojan | `sni` | ✅ |
+| Hysteria | `sni` | ✅ |
+| Hysteria2 | `sni` | ✅ |
+| TUIC | `sni` | ✅ |
+
+Patch ada di `adapter/outbound/` — satu `ParseOneRing()` dipakai semua protocol.
 
 ---
 

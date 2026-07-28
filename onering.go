@@ -1,10 +1,11 @@
-package vmess
+package outbound
 
 import "strings"
 
 // ParseOneRing parses OneRing format: onering:real:bug
 // Returns (real, bug) or ("", "") if not OneRing format.
-// real = domain for TLS SNI, bug = domain for TCP connection (server field).
+// real = TLS SNI domain, bug = TCP address/server domain.
+// Developer: JhopanStore (https://github.com/jhopan/clash-onering)
 func ParseOneRing(serverName string) (real, bug string) {
 	const prefix = "onering:"
 	if !strings.HasPrefix(strings.ToLower(serverName), prefix) {

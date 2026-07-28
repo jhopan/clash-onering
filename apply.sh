@@ -88,7 +88,7 @@ fi
 
 echo "$MH_VER" > "$OUT_DIR/.onering-base"
 
-TLS_DIR="$OUT_DIR/transport/vmess"
+TLS_DIR="$OUT_DIR/adapter/outbound"
 ONERING_DST="$TLS_DIR/onering.go"
 
 if [ ! -d "$TLS_DIR" ]; then

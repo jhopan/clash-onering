@@ -15,8 +15,11 @@ echo "=== Mihomo/Clash OneRing verify (JhopanStore) ==="
 [ -f onering.go ] && grep -q "func ParseOneRing" onering.go && echo "OK onering.go" || { echo "FAIL onering.go"; fail=1; }
 
 if [ -d mihomo ]; then
-  grep -q "func ParseOneRing" mihomo/transport/vmess/onering.go 2>/dev/null && echo "OK tree onering.go" || { echo "FAIL tree onering.go"; fail=1; }
-  grep -q "ParseOneRing" mihomo/transport/vmess/tls.go 2>/dev/null && echo "OK tls.go patched" || { echo "FAIL tls.go"; fail=1; }
+  grep -q "func ParseOneRing" mihomo/adapter/outbound/onering.go 2>/dev/null && echo "OK tree onering.go" || { echo "FAIL tree onering.go"; fail=1; }
+  for f in vless vmess trojan hysteria hysteria2 tuic; do
+    grep -q "ParseOneRing" mihomo/adapter/outbound/${f}.go 2>/dev/null \
+      && echo "OK $f patched" || { echo "FAIL $f"; fail=1; }
+  done
   [ -f mihomo/.onering-base ] && echo "OK base pin $(tr -d '\r\n' < mihomo/.onering-base)"
 else
   echo "SKIP no mihomo tree (run apply.sh)"

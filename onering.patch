@@ -1,20 +1,90 @@
-diff --git a/transport/vmess/tls.go b/transport/vmess/tls.go
-index 6bede7f..55ac2b0 100644
---- a/transport/vmess/tls.go
-+++ b/transport/vmess/tls.go
-@@ -35,9 +35,14 @@ type TLSConfig struct {
+diff --git a/adapter/outbound/hysteria.go b/adapter/outbound/hysteria.go
+index 2603295..c251684 100644
+--- a/adapter/outbound/hysteria.go
++++ b/adapter/outbound/hysteria.go
+@@ -152,6 +152,10 @@ func NewHysteria(option HysteriaOption) (*Hysteria, error) {
+ 	if option.SNI != "" {
+ 		serverName = option.SNI
+ 	}
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(serverName); real != "" {
++		serverName = real
++	}
+ 
+ 	tlsConfig, err := ca.GetTLSConfig(ca.Option{
+ 		TLSConfig: &tls.Config{
+diff --git a/adapter/outbound/hysteria2.go b/adapter/outbound/hysteria2.go
+index 8188d48..ec092f1 100644
+--- a/adapter/outbound/hysteria2.go
++++ b/adapter/outbound/hysteria2.go
+@@ -165,6 +165,10 @@ func NewHysteria2(option Hysteria2Option) (*Hysteria2, error) {
+ 	if option.SNI != "" {
+ 		serverName = option.SNI
+ 	}
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(serverName); real != "" {
++		serverName = real
++	}
+ 
+ 	tlsConfig, err := ca.GetTLSConfig(ca.Option{
+ 		TLSConfig: &tls.Config{
+diff --git a/adapter/outbound/trojan.go b/adapter/outbound/trojan.go
+index d581e80..974b413 100644
+--- a/adapter/outbound/trojan.go
++++ b/adapter/outbound/trojan.go
+@@ -286,6 +286,10 @@ func NewTrojan(option TrojanOption) (*Trojan, error) {
+ 	if option.SNI == "" {
+ 		option.SNI = option.Server
+ 	}
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(option.SNI); real != "" {
++		option.SNI = real
++	}
+ 
+ 	t := &Trojan{
+ 		Base: NewBase(BaseOption{
+diff --git a/adapter/outbound/tuic.go b/adapter/outbound/tuic.go
+index c08c80f..0784ef9 100644
+--- a/adapter/outbound/tuic.go
++++ b/adapter/outbound/tuic.go
+@@ -132,6 +132,10 @@ func NewTuic(option TuicOption) (*Tuic, error) {
+ 	if option.SNI != "" {
+ 		serverName = option.SNI
+ 	}
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(serverName); real != "" {
++		serverName = real
++	}
+ 
+ 	tlsConfig, err := ca.GetTLSConfig(ca.Option{
+ 		TLSConfig: &tls.Config{
+diff --git a/adapter/outbound/vless.go b/adapter/outbound/vless.go
+index 4d076b5..21466b3 100644
+--- a/adapter/outbound/vless.go
++++ b/adapter/outbound/vless.go
+@@ -459,6 +459,10 @@ func parseVlessAddr(metadata *C.Metadata, xudp bool) *vless.DstAddr {
  }
  
- func (cfg *TLSConfig) ToStdConfig() (*tls.Config, error) {
-+	host := cfg.Host
+ func NewVless(option VlessOption) (*Vless, error) {
 +	// OneRing: onering:real:bug → SNI = real domain
-+	if real, _ := ParseOneRing(host); real != "" {
-+		host = real
++	if real, _ := ParseOneRing(option.ServerName); real != "" {
++		option.ServerName = real
 +	}
- 	return ca.GetTLSConfig(ca.Option{
- 		TLSConfig: &tls.Config{
--			ServerName:         cfg.Host,
-+			ServerName:         host,
- 			InsecureSkipVerify: cfg.SkipCertVerify,
- 			NextProtos:         cfg.NextProtos,
- 		},
+ 	var addons *vless.Addons
+ 	if len(option.Flow) >= 16 {
+ 		option.Flow = option.Flow[:16]
+diff --git a/adapter/outbound/vmess.go b/adapter/outbound/vmess.go
+index aef7cce..968e022 100644
+--- a/adapter/outbound/vmess.go
++++ b/adapter/outbound/vmess.go
+@@ -467,6 +467,10 @@ func (v *Vmess) SupportUOT() bool {
+ }
+ 
+ func NewVmess(option VmessOption) (*Vmess, error) {
++	// OneRing: onering:real:bug → SNI = real domain
++	if real, _ := ParseOneRing(option.ServerName); real != "" {
++		option.ServerName = real
++	}
+ 	security := strings.ToLower(option.Cipher)
+ 	var options []vmess.ClientOption
+ 	if option.GlobalPadding {
