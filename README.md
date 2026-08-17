@@ -200,6 +200,66 @@ proxies:
 | `servername` / `sni` | `onering:REAL:BUG` | format OneRing |
 | WS `Host` | real domain | header WebSocket |
 
+> ⚠️ **VLESS & VMess pakai `servername`, BUKAN `sni`.** Key `sni:` di VLESS diabaikan diam-diam oleh Mihomo — OneRing patch tidak akan pernah trigger. `sni` hanya valid untuk Trojan/Hysteria/Hysteria2/TUIC.
+
+---
+
+## 🌐 DNS Config (OpenClash / Mihomo)
+
+Ada 2 jenis DNS dengan fungsi berbeda — salah set = proxy `alive:false` (gagal dial).
+
+| DNS | Fungsi | Kapan dipakai | Harus pakai |
+|---|---|---|---|
+| `proxy-server-nameserver` | Resolve domain server VPN (`support.zoom.us`) untuk dial pertama | **SEBELUM** proxy hidup | DNS yang reachable **tanpa proxy** |
+| `nameserver` / `fallback` | Resolve domain browsing biasa | **SETELAH** proxy hidup | Bebas (lewat proxy, anti DNS leak) |
+
+### Masalah Chicken-and-Egg
+
+`proxy-server-nameserver` pakai `8.8.8.8` tapi proxy belum hidup → `8.8.8.8` tidak reachable → gagal resolve bug domain → proxy tidak bisa mulai. Solusi: pakai DNS lokal/gateway yang reachable langsung.
+
+### Config Rekomendasi
+
+```yaml
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+
+  # DNS koneksi VPN PERTAMA (sebelum proxy hidup)
+  # system:// = auto ikut DNS koneksi aktif (modem/USB tethering/apapun)
+  proxy-server-nameserver:
+    - system://
+    - 8.8.8.8
+    - 1.1.1.1
+
+  # DNS browsing (setelah proxy hidup, lewat tunnel)
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  fallback:
+    - 8.8.4.4
+    - 1.0.0.1
+```
+
+### Catatan Penting
+
+- **Urutan tidak berpengaruh** — Mihomo query semua server di `proxy-server-nameserver` secara **paralel** dan ambil jawaban sukses pertama (`batchExchange` di `dns/util.go`). Taruh beberapa sekaligus, yang tercepat menang.
+- **`system://`** paling universal: otomatis ikut DNS gateway koneksi aktif. Ganti modem ↔ USB tethering tidak perlu ubah config.
+- **`dhcp://<interface>`** (misal `dhcp://usb0`) juga didukung — auto-discover DNS dari DHCP interface tertentu.
+- **DNS leak**: setelah proxy hidup, TUN mode hijack semua port 53 → DNS browsing keluar lewat tunnel. Yang terlihat ISP hanya 1 query bootstrap ke bug domain (memang harus, tanpa itu proxy tidak bisa mulai).
+- **ISP Indonesia sering intercept semua DNS** (transparent DNS hijack) — query ke IP manapun dijawab oleh DNS operator. Ini membantu bootstrap tapi jangan dijadikan acuan test DNS.
+- **`ipv6: false`** penting jika bug domain resolve IPv6-only dari DNS tertentu tapi perangkat tidak punya route IPv6 → dial gagal.
+
+### Troubleshooting Proxy `alive:false`
+
+| Gejala | Penyebab | Fix |
+|---|---|---|
+| Proxy tidak muncul di provider | YAML rusak (indentasi/quote) | Validasi YAML, pastikan indentasi 2 spasi |
+| Proxy muncul tapi `alive:false` | DNS bootstrap gagal | Ganti `proxy-server-nameserver` ke `system://` atau DNS gateway |
+| OneRing tidak trigger di VLESS | Pakai key `sni:` | Ganti ke `servername:` |
+| Dial timeout | Bug domain resolve IPv6-only, tidak ada route IPv6 | Set `ipv6: false` di DNS config |
+| Tiba-tiba mati | Koneksi data modem/tethering putus | Cek internet mentah dulu (`/etc/init.d/openclash stop` lalu test) sebelum curiga config |
+
 ---
 
 ## 🚀 Deploy
