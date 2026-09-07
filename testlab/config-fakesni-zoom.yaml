@@ -1,0 +1,31 @@
+# FAKE-SNI (onering terbalik) — SNI kawat = zoom, koneksi = langsung VPS
+# Tanpa DNS sama sekali: IP VPS di-hardcode
+mixed-port: 7894
+external-controller: 127.0.0.1:9098
+mode: rule
+log-level: info
+ipv6: false
+
+proxies:
+  - name: "fakeSNI-zoom"
+    type: vless
+    server: 103.169.207.207          # IP VPS neva — hardcoded, tanpa resolve
+    port: 443
+    uuid: 32338fae-7fad-4e77-88c0-c1a24a0af782
+    network: ws
+    tls: true
+    skip-cert-verify: true           # WAJIB: cert server = neva, SNI kawat = zoom
+    servername: support.zoom.us      # SNI di kawat → DPI operator lihat "zoom"
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id
+    udp: true
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [fakeSNI-zoom]
+
+rules:
+  - MATCH,PROXY

@@ -1,0 +1,41 @@
+# Replika config user (Jhopan-Neva, custom hostname CF) dalam format OneRing
+mixed-port: 7894
+external-controller: 127.0.0.1:9098
+mode: rule
+log-level: info
+ipv6: false
+
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  proxy-server-nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+
+proxies:
+  - name: "Jhopan-Neva-onering"
+    type: vless
+    server: support.zoom.us                                  # ← dari config user
+    port: 443
+    uuid: 32338fae-7fad-4e77-88c0-c1a24a0af782               # ← UUID config user
+    network: ws
+    tls: true
+    skip-cert-verify: true                                   # ← dari config user
+    servername: "onering:neva.jhopanstore.my.id:support.zoom.us"   # ← versi OneRing
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id
+    udp: true
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [Jhopan-Neva-onering]
+
+rules:
+  - MATCH,PROXY
