@@ -1,0 +1,29 @@
+# Config test isolasi SNI — bug = listener lokal 127.0.0.1:8443
+mixed-port: 7892
+external-controller: 127.0.0.1:9096
+mode: rule
+log-level: info
+ipv6: false
+
+proxies:
+  - name: "onering-local"
+    type: vless
+    server: 127.0.0.1          # bug (TCP dial target)
+    port: 8443
+    uuid: 00000000-0000-0000-0000-000000000000
+    network: ws
+    tls: true
+    servername: "onering:neva.jhopanstore.my.id:127.0.0.1"
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id
+    client-fingerprint: chrome
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [onering-local]
+
+rules:
+  - MATCH,PROXY

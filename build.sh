@@ -66,7 +66,7 @@ if [ ! -d "$SRC" ]; then
   echo "[-] $SRC missing. pakai: bash build.sh --ver v1.19.29 all" >&2
   exit 1
 fi
-if ! grep -q "$MARKER" "$SRC/transport/vmess/onering.go" 2>/dev/null; then
+if ! grep -q "$MARKER" "$SRC/adapter/outbound/onering.go" 2>/dev/null; then
   echo "[-] OneRing belum di tree. jalankan: bash apply.sh" >&2
   exit 1
 fi
@@ -87,8 +87,8 @@ build_one() {
     env CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" ${extra[@]+"${extra[@]}"} \
       go build -trimpath \
       -ldflags="$LDFLAGS -X github.com/metacubex/mihomo/constant.Version=$MH_VER_LABEL" \
-      -o "$ROOT/$DIST/$out" .
-  ) && ls -lh "$ROOT/$DIST/$out" || { echo "[-] build failed: $out" >&2; return 1; }
+      -o "../$DIST/$out" .
+  ) && ls -lh "$DIST/$out" || { echo "[-] build failed: $out" >&2; return 1; }
 }
 
 do_target() {

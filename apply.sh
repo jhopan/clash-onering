@@ -103,9 +103,9 @@ else
   cp "$ROOT/$ONERING_GO" "$ONERING_DST"
 
   echo "[*] apply $PATCH"
-  if ! git -C "$OUT_DIR" apply --whitespace=nowarn "$ROOT/$PATCH"; then
+  if ! git -C "$OUT_DIR" apply --whitespace=nowarn "../$PATCH"; then
     echo "[-] git apply failed for base $MH_VER" >&2
-    echo "    try: git -C $OUT_DIR apply --reject $ROOT/$PATCH" >&2
+    echo "    try: git -C $OUT_DIR apply --reject ../$PATCH" >&2
     rm -f "$ONERING_DST"
     exit 1
   fi
