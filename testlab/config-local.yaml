@@ -1,4 +1,4 @@
-# Config test isolasi SNI — bug = listener lokal 127.0.0.1:8443
+# Config test isolasi SNI — bug = listener lokal 127.0.0.1:18443 (port bersih)
 mixed-port: 7892
 external-controller: 127.0.0.1:9096
 mode: rule
@@ -9,7 +9,7 @@ proxies:
   - name: "onering-local"
     type: vless
     server: 127.0.0.1          # bug (TCP dial target)
-    port: 8443
+    port: 18443
     uuid: 00000000-0000-0000-0000-000000000000
     network: ws
     tls: true
