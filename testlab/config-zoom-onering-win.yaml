@@ -1,0 +1,30 @@
+# ONERING via Wi-Fi zoom-only — dial bug=zoom, SNI=real (neva)
+mixed-port: 7893
+external-controller: 127.0.0.1:9097
+mode: rule
+log-level: info
+ipv6: false
+interface-name: Wi-Fi
+
+proxies:
+  - name: "zoom-onering"
+    type: vless
+    server: support.zoom.us          # bug — dial target
+    port: 443
+    uuid: 4062336e-1307-41d1-8df3-b075034cb213
+    network: ws
+    tls: true
+    servername: "onering:neva.jhopanstore.my.id:support.zoom.us"   # SNI → neva
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id
+    interface-name: Wi-Fi
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [zoom-onering]
+
+rules:
+  - MATCH,PROXY
