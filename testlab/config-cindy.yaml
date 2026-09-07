@@ -1,0 +1,44 @@
+# Baseline: URI asli user (VPN-cindy) — server=real, SNI=real
+# vless://4062336e-1307-41d1-8df3-b075034cb213@neva.jhopanstore.my.id:443
+#   ?encryption=none&security=tls&sni=neva.jhopanstore.my.id&type=ws&host=neva.jhopanstore.my.id&path=%2Fvless
+mixed-port: 7891
+external-controller: 127.0.0.1:9095
+external-ui: ui
+secret: ""
+mode: rule
+log-level: info
+ipv6: false
+
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  # FASE 1 bootstrap: WSL system DNS lagi bork → langsung public
+  proxy-server-nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+
+proxies:
+  - name: "VPN-cindy"
+    type: vless
+    server: neva.jhopanstore.my.id
+    port: 443
+    uuid: 4062336e-1307-41d1-8df3-b075034cb213
+    network: ws
+    tls: true
+    servername: neva.jhopanstore.my.id
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [VPN-cindy]
+
+rules:
+  - MATCH,PROXY

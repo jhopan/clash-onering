@@ -1,0 +1,39 @@
+# OneRing variant dari URI user — bug=support.zoom.us, SNI dialihkan ke real
+mixed-port: 7892
+external-controller: 127.0.0.1:9096
+mode: rule
+log-level: info
+ipv6: false
+
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  proxy-server-nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+
+proxies:
+  - name: "VPN-cindy-onering"
+    type: vless
+    server: support.zoom.us          # bug — TCP dial target
+    port: 443
+    uuid: 4062336e-1307-41d1-8df3-b075034cb213
+    network: ws
+    tls: true
+    servername: "onering:neva.jhopanstore.my.id:support.zoom.us"   # OneRing format
+    ws-opts:
+      path: /vless
+      headers:
+        Host: neva.jhopanstore.my.id   # real domain
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: [VPN-cindy-onering]
+
+rules:
+  - MATCH,PROXY
