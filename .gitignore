@@ -4,3 +4,5 @@ dist/
 *.onering
 *.onering.exe
 mihomo.*.onering*
+testlab/cache.db
+testlab/*.log
